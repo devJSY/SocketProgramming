@@ -1,0 +1,58 @@
+# Visual Studio
+.vs/
+*.vcxproj.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+Debug/
+Release/
+x64/
+x86/
+*.obj
+*.pdb
+*.idb
+*.ipch
+*.aps
+*.ncb
+*.log
+*.tlog
+*.lastbuildstate
+*.cachefile
+*.db
+*.ilk
+*.res
+*.pch
+
+# Compiled binary files
+*.exe
+*.dll
+*.lib
+*.exp
+
+# Other temporary files
+*.tmp
+*.log
+*.bak
+
+# Directories
+ipch/
+GeneratedFiles/
+bin/
+build/
+
+# CMake (혹시 쓴다면)
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Windows thumbnail cache files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# VS Code
+.vscode/
