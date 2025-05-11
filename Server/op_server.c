@@ -4,15 +4,17 @@
 #include <winsock2.h>
 
 #define BUF_SIZE 1024
+#define OPSZ 4
 void ErrorHandling(char* message);
+int calculate(int opnum, int opnds[], char oprator);
 
 int main(int argc, char* argv[])
 {
     WSADATA wsaData;
     SOCKET hServSock, hClntSock;
-    char message[BUF_SIZE];
-    int strLen, i;
-
+    char opinfo[BUF_SIZE];
+    int result, opndCnt, i;
+    int recvCnt, recvLen;
     SOCKADDR_IN servAdr, clntAdr;
     int clntAdrSize;
 
@@ -44,25 +46,24 @@ int main(int argc, char* argv[])
 
     for (i = 0; i < 5; ++i)
     {
+        opndCnt = 0;
         hClntSock = accept(hServSock, (SOCKADDR*)&clntAdr, &clntAdrSize);
-        if (hClntSock == -1)
-            ErrorHandling("accept() error");
-        else
-            printf("Connected client %d \n", i + 1);
+        recv(hClntSock, &opndCnt, 1, 0);
 
-        while ((strLen = recv(hClntSock, message, BUF_SIZE, 0)) != 0)
+        recvLen = 0;
+        while ((opndCnt * OPSZ + 1) > recvLen)
         {
-            message[strLen - 1] = 0;
-            printf("Client Message %d : %s\n", i + 1, message);
-            send(hClntSock, message, strLen, 0);
+            recvCnt = recv(hClntSock, &opinfo[recvLen], BUF_SIZE - 1, 0);
+            recvLen += recvCnt;
         }
-
+        result = calculate(opndCnt, (int*)opinfo, opinfo[recvLen - 1]);
+        send(hClntSock, (char*)&result, sizeof(result), 0);
         closesocket(hClntSock);
     }
 
     closesocket(hServSock);
     WSACleanup();
-    
+
     return 0;
 }
 
@@ -71,4 +72,27 @@ void ErrorHandling(char* message)
     fputs(message, stderr);
     fputc('\n', stderr);
     exit(1);
+}
+
+int calculate(int opnum, int opnds[], char oprator)
+{
+    int result = opnds[0], i;
+
+    switch (oprator)
+    {
+    case '+':
+        for (i = 1; i < opnum; ++i)
+            result += opnds[i];
+        break;
+    case '-':
+        for (i = 1; i < opnum; ++i)
+            result -= opnds[i];
+        break;
+    case '*':
+        for (i = 1; i < opnum; ++i)
+            result *= opnds[i];
+        break;
+    }
+
+    return result;
 }

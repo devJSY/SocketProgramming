@@ -1,4 +1,5 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,14 +7,16 @@
 #include <winsock2.h>
 
 #define BUF_SIZE 1024
+#define RLT_SIZE 4
+#define OPSZ 4
 void ErrorHandling(char* message);
 
 int main(int argc, char* argv[])
 {
     WSADATA wsaData;
     SOCKET hSocket;
-    char message[BUF_SIZE];
-    int strLen;
+    char opmsg[BUF_SIZE];
+    int result, opndCnt, i;
     SOCKADDR_IN servAdr;
 
     if (argc != 3)
@@ -39,20 +42,22 @@ int main(int argc, char* argv[])
     else
         puts("Connected..............");
 
-    while (1)
+    fputs("Operand Count: ", stdout);
+    scanf("%d", &opndCnt);
+    opmsg[0] = (char)opndCnt;
+
+    for (i = 0; i < opndCnt; ++i)
     {
-        fputs("Input message(Q to quit): ", stdout);
-        fgets(message, BUF_SIZE, stdin);
-
-        if (!strcmp(message, "q\n") || !strcmp(message, "Q\n"))
-            break;
-
-        send(hSocket, message, strlen(message), 0);
-        strLen = recv(hSocket, message, BUF_SIZE - 1, 0);
-        message[strLen] = 0;
-        printf("Message from server: %s\n", message);
+        printf("Operand %d: ", i + 1);
+        scanf("%d", (int*)&opmsg[i * OPSZ + 1]);
     }
+    fgetc(stdin);
+    fputs("Operator: ", stdout);
+    scanf("%c", &opmsg[opndCnt * OPSZ + 1]);
+    send(hSocket, opmsg, opndCnt * OPSZ +2, 0);
+    recv(hSocket, &result, RLT_SIZE, 0);
     
+    printf("Operation result: %d \n", result);
     closesocket(hSocket);
     WSACleanup();
 

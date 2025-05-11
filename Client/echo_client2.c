@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     WSADATA wsaData;
     SOCKET hSocket;
     char message[BUF_SIZE];
-    int strLen;
+    int strLen, recv_len, recv_cnt;
     SOCKADDR_IN servAdr;
 
     if (argc != 3)
@@ -47,12 +47,25 @@ int main(int argc, char* argv[])
         if (!strcmp(message, "q\n") || !strcmp(message, "Q\n"))
             break;
 
-        send(hSocket, message, strlen(message), 0);
-        strLen = recv(hSocket, message, BUF_SIZE - 1, 0);
+        strLen = send(hSocket, message, strlen(message), 0);
+
+        recv_len = 0;
+        while (recv_len < strLen)
+        {
+            recv_cnt = recv(hSocket, message, BUF_SIZE - 1, 0);
+            if (recv_cnt == -1)
+            {
+                ErrorHandling("read() error!");
+                continue;
+            }
+
+            recv_len += recv_cnt;
+        }
+
         message[strLen] = 0;
         printf("Message from server: %s\n", message);
     }
-    
+
     closesocket(hSocket);
     WSACleanup();
 

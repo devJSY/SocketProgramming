@@ -24,5 +24,11 @@
     <ClCompile Include="echo_client.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="echo_client2.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="op.client.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
